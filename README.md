@@ -74,7 +74,9 @@ For a complete MATLAB example, see
 
 ## 📜 License
 This work is distributed under the **CC BY-NC-ND 4.0 License**.  
-Non-commercial use only. Modifications are not permitted.  
+Non-commercial use only. Modifications are not permitted. 
+For full license text, see the [LICENSE](LICENSE) file or visit  
+👉 [https://creativecommons.org/licenses/by-nc-nd/4.0/](https://creativecommons.org/licenses/by-nc-nd/4.0/) 
 If you use this library in your research, please cite the related paper below.
 
 ---
