@@ -2,6 +2,52 @@
 GPU-accelerated library for real-time limited-angle optical diffraction tomography (LaODT). Enables fast 3D image reconstruction using Direct Inverse and Gerchberg–Papoulis algorithms. Handles very large datasets with adjustable iteration count. Provided as a compiled DLL for easy integration.
 
 ---
+## Workflows
+
+The library provides two equivalent reconstruction workflows that differ in how input data are provided and processed.
+
+### **1. Raw-data Workflow**
+This workflow starts directly from **raw holograms** (e.g., data from the detector). It performs all preprocessing, including optional reference correction, on the GPU.
+
+#### Example sequence:
+```c
+HL_addReference(...);                           // optional reference
+HL00to02_FromPreprocToGenKO(...);               // hologram -> preprocessing -> K-space
+HL03_setParamsAndStartDIandGP(...);       		// reconstruction (Direct Inverse or iterative)
+HL04_takeReconstructionAndFreeMemory(...);      // get final reconstruction
+```
+
+✅ **Key features:**
+- Input: raw holograms (`short int`)
+- Automatic preprocessing (FFT, filtering, windowing, normalization)
+- Optional reference handling (`HL_addReference()`)
+- Fastest and simplest path for real-time or automated processing
+
+---
+
+### **2. Preprocessed-data Workflow**
+This workflow starts from **preprocessed sinograms** (amplitude and phase). It gives full control over each stage of the reconstruction and allows retrieval of intermediate results.
+
+#### Example sequence:
+```c
+HL01_setParams(...);
+HL02_sendDataAndGenerateKO(...);                // sinograms -> K-space
+HL03_setParamsAndStartDIandGP(...);
+HL04_takeReconstructionAndFreeMemory(...);
+```
+
+✅ **Key features:**
+- Input: preprocessed sinograms (`float`)
+- User-controlled preprocessing (external or custom)
+- No optional reference handling (`HL_addReference()`)
+
+---
+
+### **Backward Compatibility**
+The function `HL00_addReference()` remains available as an alias for `HL_addReference()` for backward compatibility.
+
+---
+
 
 ## 📁 Repository Structure
 
