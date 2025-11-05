@@ -2,52 +2,68 @@
 GPU-accelerated library for real-time limited-angle optical diffraction tomography (LaODT). Enables fast 3D image reconstruction using Direct Inverse and Gerchberg–Papoulis algorithms. Handles very large datasets with adjustable iteration count. Provided as a compiled DLL for easy integration.
 
 ---
-## Workflows
 
-The library provides two equivalent reconstruction workflows that differ in how input data are provided and processed.
-
-### **1. Raw-data Workflow**
-This workflow starts directly from **raw holograms** (e.g., data from the detector). It performs all preprocessing, including optional reference correction, on the GPU.
-
-#### Example sequence:
-```c
-HL_addReference(...);                           // optional reference
-HL00to02_FromPreprocToGenKO(...);               // hologram -> preprocessing -> K-space
-HL03_setParamsAndStartDIandGP(...);       		// reconstruction (Direct Inverse or iterative)
-HL04_takeReconstructionAndFreeMemory(...);      // get final reconstruction
-```
-
-✅ **Key features:**
-- Input: raw holograms (`short int`)
-- Automatic preprocessing (FFT, filtering, windowing, normalization)
-- Optional reference handling (`HL_addReference()`)
-- Fastest and simplest path for real-time or automated processing
+## Table of Contents
+1. [Overview](#overview)
+2. [Requirements](#-requirements)
+3. [Installation](#installation)
+4. [Repository Structure](#repository-structure)
+5. [Workflows](#workflows)
+6. [Usage Example (MATLAB)](#usage-example-matlab)
+7. [Relation to the Collaborating Group’s Library](#relation-to-the-collaborating-groups-library)
+8. [License](#license)
+9. [Citation](#citation)
+10. [Contact](#contact)
 
 ---
 
-### **2. Preprocessed-data Workflow**
-This workflow starts from **preprocessed sinograms** (amplitude and phase). It gives full control over each stage of the reconstruction and allows retrieval of intermediate results.
+## Overview
 
-#### Example sequence:
-```c
-HL01_setParams(...);
-HL02_sendDataAndGenerateKO(...);                // sinograms -> K-space
-HL03_setParamsAndStartDIandGP(...);
-HL04_takeReconstructionAndFreeMemory(...);
-```
+The ODT_GPU_Library was developed as a response to the growing demand for high-speed, high-quality data processing in limited-angle optical diffraction tomography (LaODT).  
 
-✅ **Key features:**
-- Input: preprocessed sinograms (`float`)
-- User-controlled preprocessing (external or custom)
-- No optional reference handling (`HL_addReference()`)
+This library provides a fully GPU-accelerated implementation of key numerical procedures — including preprocessing, K-space generation, and tomographic reconstruction using Direct Inverse and Gerchberg–Papoulis algorithms.
+
+Here, we propose for the first time, to the best of our knowledge,
+a high-speed CUDA implementation of the ODT reconstruction algorithm that enables full and accurate reconstruction through an iterative procedure, without compromising image quality, limiting the measurement volume, the number of angular projections, or requiring a real-to-complex Hermitian Fourier transform.
+
+The library is distributed as a precompiled dynamic-link library (DLL) that can be easily integrated with MATLAB, LabVIEW, Python, or custom C/C++ software, allowing researchers to seamlessly incorporate high-performance tomographic reconstruction into their experimental workflows.
 
 ---
 
-### **Backward Compatibility**
-The function `HL00_addReference()` remains available as an alias for `HL_addReference()` for backward compatibility.
+## 🧠 Requirements
+- **Operating system:** Windows 10 or 11 (64-bit)  
+- **GPU:** NVIDIA GPU supporting CUDA Technology
+- **CUDA Toolkit:** Supported builds  
+  - 10.2  
+  - 12.1  
+  - 12.6  
+  - 13.0  
+- **Microsoft Visual C++ Redistributable packages for Visual Studio 2019**
+- **MATLAB** (optional, for example scripts)  
 
 ---
 
+
+## Installation
+
+To use the ODT GPU Library, make sure the following components are installed:
+
+- **MATLAB** (R2020a or newer) – required for example scripts and integration.
+- **NVIDIA CUDA Toolkit** (matching the version of your selected DLL).
+- **Microsoft Visual C++ Redistributable Package** – required for loading the compiled DLL.
+
+### Steps:
+1. Download the appropriate precompiled DLL from `bin/v-1_0/` (matching your CUDA Toolkit version).
+2. Copy the corresponding header file (`CUDAprocessing.h`) to your project directory.
+3. Ensure MATLAB has access to the DLL and header paths:
+   ```matlab
+   loadlibrary('CUDAprocessing.dll', 'CUDAprocessing.h');
+   ```
+4. Run one of the example scripts provided in the `examples/` directory to verify the setup.
+
+> 💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
+
+---
 
 ## 📁 Repository Structure
 
@@ -69,9 +85,39 @@ ODT_GPU_Library/
 │       ├── example_reconstruction.m
 │       └── workspace.mat
 │
+├── docs/
+│   ├── INSTALL.md
+│   └── USAGE.md
 ├── LICENSE
 └── README.md
 ```
+
+---
+
+## Workflows
+
+The library supports two main workflows:
+
+1. **Raw-data Workflow** — starting from detector holograms, performs full preprocessing and reconstruction directly on the GPU.
+2. **Preprocessed-data Workflow** — starts from preprocessed sinograms, offering fine control and access to intermediate data.
+
+### Example sequence:
+
+**Raw-data Workflow**
+```c
+HL_addReference(...);                           // optional reference
+HL00to02_FromPreprocToGenKO(...);               // hologram -> preprocessing -> K-space
+HL03_setParamsAndStartDIandGP(...);       		// reconstruction (Direct Inverse or iterative)
+HL04_takeReconstructionAndFreeMemory(...);      // get final reconstruction
+```
+
+✅ **Key features:**
+- Input: raw holograms (`short int`)
+- Automatic preprocessing (FFT, filtering, windowing, normalization)
+- Optional reference handling (`HL_addReference()`)
+- Fastest and simplest path for real-time or automated processing
+
+For detailed step-by-step examples of both workflows, see the [Usage Guide](docs/USAGE.md).
 
 ---
 
@@ -104,6 +150,13 @@ For a complete MATLAB example, see
 
 ---
 
+## Relation to the Collaborating Group’s Library
+
+A MATLAB-based implementation of the LaODT reconstruction algorithm, developed and published by a collaborating research group, is available at [EWALD](https://github.com/biopto/EWALD).  
+The GPU-accelerated library presented here was developed in close collaboration with that group but implemented independently and entirely from scratch, with the goal of achieving real-time performance and enhanced computational efficiency on modern graphics hardware.  
+
+Although the numerical methods and data processing strategies differ fundamentally from the MATLAB implementation, the API structure and naming conventions were intentionally designed to remain compatible with it.  
+This approach facilitates direct comparison and validation of reconstruction results between the two environments while maintaining complete algorithmic and implementation independence.
 
 ## 🧠 Requirements
 - **Operating system:** Windows 10 or 11 (64-bit)  
