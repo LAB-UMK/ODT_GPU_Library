@@ -9,81 +9,86 @@ This document describes the steps required to correctly install and configure th
 - **Operating System:** Windows 10 / 11 (64-bit)
 - **GPU:** NVIDIA GPU supporting CUDA Technology
 - **Software:**
-  - **MATLAB R2020a** or newer
-  - **NVIDIA CUDA Toolkit** (version matching the chosen DLL build, e.g. 10.2, 12.1, 12.6)
+  - **MATLAB R2020a** or newer with MinGW-w64 C/C++ Compiler add-on
+  - **NVIDIA CUDA Toolkit** (version matching the chosen DLL build, e.g. 10.2, 12.1, 12.6, 13.0)
   - **Microsoft Visual C++ Redistributable Package (x64)**
 
 ---
 
-## 2. Downloading the Library
+## 2. Preparing the Environment
 
-1. Navigate to the `bin/` directory in this repository.  
-2. Choose the appropriate version:
-   ```
-   bin/
-     v-1_0/
-       cuda-10_2/
-       cuda-12_1/
-       cuda-12_6/
-   ```
-3. Download:
-   - The DLL file (`CUDAprocessing.dll`)
-   - The header file (`CUDAprocessing.h`)
+### 1. Install MATLAB
+Ensure MATLAB is installed and functioning correctly.
 
----
+### 2. Install MATLAB MinGW-w64 C/C++ Compiler
+Required to load external DLLs via loadlibrary().
 
-## 3. MATLAB Integration
+Check installation in MATLAB:
+mex -setup cpp
 
-1. Copy both files (`CUDAprocessing.dll` and `CUDAprocessing.h`) to your MATLAB working directory.
-2. Load the library:
-   ```matlab
-   fullpathToDll = 'path\to\CUDAprocessing.dll';
-   fullpathToHeader = 'path\to\CUDAprocessing.h';
-   loadlibrary(fullpathToDll, fullpathToHeader);
-   ```
-3. Verify the installation by calling:
-   ```matlab
-   libfunctions('CUDAprocessing', '-full')
-   ```
-   This should display a list of all exported functions.
+If missing, install it via Add-On Manager:
+Home → Add-Ons → Get Add-Ons → “MinGW-w64 C/C++ Compiler”
+
+### 3. Install the NVIDIA CUDA Toolkit
+Install the CUDA version matching the DLL folder (10.2, 12.1, 12.6, or 13.0).
+
+Verify the installation:
+nvcc --version
+
+### 4. Install Microsoft Visual C++ Redistributable (x64)
+Download:
+https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
 
 ---
 
-## 4. CUDA Toolkit Compatibility
+## 3. Downloading the Library (with CUDA Compatibility)
 
-Ensure that the version of the CUDA Toolkit installed on your system **matches the DLL version** you downloaded.  
-If you are using CUDA 12.1, download the DLL from:
-```
-bin/v-1_0/cuda-12_1/
-```
+Navigate to the repository folder:
 
-> ⚠️ If versions do not match, MATLAB may report an error such as:  
-> *“The specified module could not be found.”*  
-> This typically indicates a mismatch between DLL and runtime toolkit.
+bin/  
+  v-1_0/  
+    cuda-10_2/  
+    cuda-12_1/  
+    cuda-12_6/  
+    cuda-13_0/  
+
+Download two files:
+- CUDAprocessing.dll  
+- CUDAprocessing.h  
+
+### CUDA Compatibility Table
+
+Installed CUDA Toolkit | DLL Folder  
+----------------------|----------------  
+CUDA 10.2             | cuda-10_2/  
+CUDA 12.1             | cuda-12_1/  
+CUDA 12.6             | cuda-12_6/  
+CUDA 13.0             | cuda-13_0/  
 
 ---
 
-## 5. Microsoft Visual C++ Redistributable
+## 4. MATLAB Integration
 
-The library depends on the standard Microsoft Visual C++ runtime.  
-Install the latest version from the official Microsoft website:  
-👉 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
+Copy the DLL and header file to your MATLAB working directory.
+
+Load the library:
+
+dll = 'path\\CUDAprocessing.dll';  
+hdr = 'path\\CUDAprocessing.h';  
+loadlibrary(dll, hdr);
+
+Verify available functions:
+
+libfunctions('CUDAprocessing', '-full')
 
 ---
 
-## 6. Verifying the Installation
+## 5. Verifying the Installation
 
-1. Open MATLAB.
-2. Load the library as shown above.
-3. Run one of the provided example scripts:
-   ```matlab
-   example_real_time.m
-   ```
-4. If the GPU is properly initialized, you should see console output similar to:
-   ```
-   CUDA device initialized successfully.
-   ```
-5. A test reconstruction will appear in a MATLAB figure window.
+1. Load the library  
+2. Run a minimal example workflow  
+3. Confirm that the GPU initializes correctly  
+4. A reconstructed image slice should appear  
 
 ---
 
