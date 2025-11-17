@@ -37,7 +37,7 @@ nvcc --version
 
 ### 4. Install Microsoft Visual C++ Redistributable (x64)
 Download:
-https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
+https://aka.ms/vc14/vc_redist.x64.exe
 
 ---
 
