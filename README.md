@@ -46,6 +46,8 @@ The library is distributed as a precompiled dynamic-link library (DLL) that can 
 
 ## Installation
 
+💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
+
 To use the ODT GPU Library, make sure the following components are installed:
 
 - **MATLAB** (R2020a or newer) – required for example scripts and integration.
@@ -53,15 +55,14 @@ To use the ODT GPU Library, make sure the following components are installed:
 - **Microsoft Visual C++ Redistributable Package** – required for loading the compiled DLL.
 
 ### Steps:
-1. Download the appropriate precompiled DLL from `bin/v-1_0/` (matching your CUDA Toolkit version).
-2. Copy the corresponding header file (`CUDAprocessing.h`) to your project directory.
-3. Ensure MATLAB has access to the DLL and header paths:
-   ```matlab
-   loadlibrary('CUDAprocessing.dll', 'CUDAprocessing.h');
-   ```
-4. Run one of the example scripts provided in the `examples/` directory to verify the setup.
+1. Install MATLAB
+2. Install MATLAB Add-On: MinGW-w64 C/C++ Compiler
+3. Install the NVIDIA CUDA Toolkit (version 10.2, 12.1, 12.6, or 13.0)
+4. Install Microsoft Visual C++ Redistributable (x64)
+5. Download ODT_GPU_Library (using Git LFS or manually download each binary file)
+6. Run the example script provided in the `examples/` directory to verify the setup (ensure the library version used in the script is compatible with the installed CUDA Toolkit version)
 
-> 💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
+💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
 
 ---
 
@@ -71,7 +72,7 @@ To use the ODT GPU Library, make sure the following components are installed:
 ODT_GPU_Library/
 │
 ├── include/                     # Header files
-│   └── CUDAprocessing.h
+│   └── ODT_GPU.h
 │
 ├── bin/                         # Precompiled DLLs
 │   └── v-1_0/
@@ -83,7 +84,11 @@ ODT_GPU_Library/
 ├── examples/
 │   └── matlab/
 │       ├── example_reconstruction.m
-│       └── workspace.mat
+│       ├── checkError.m
+│       ├── convertFloatMatrixForC.m
+│       ├── convertIntMatrixForC.m
+│       ├── convertMatrixFromCToMatlab.m
+│       └── dataAndParams.mat
 │
 ├── docs/
 │   ├── INSTALL.md

@@ -18,22 +18,15 @@ This document describes the steps required to correctly install and configure th
 ## 2. Preparing the Environment
 
 ### 1. Install MATLAB
-Ensure MATLAB is installed and functioning correctly.
 
-### 2. Install MATLAB MinGW-w64 C/C++ Compiler
+### 2. Install MATLAB Add-On: MinGW-w64 C/C++ Compiler
 Required to load external DLLs via loadlibrary().
-
-Check installation in MATLAB:
-mex -setup cpp
 
 If missing, install it via Add-On Manager:
 Home → Add-Ons → Get Add-Ons → “MinGW-w64 C/C++ Compiler”
 
 ### 3. Install the NVIDIA CUDA Toolkit
 Install the CUDA version matching the DLL folder (10.2, 12.1, 12.6, or 13.0).
-
-Verify the installation:
-nvcc --version
 
 ### 4. Install Microsoft Visual C++ Redistributable (x64)
 Download:
@@ -42,6 +35,9 @@ https://aka.ms/vc14/vc_redist.x64.exe
 ---
 
 ## 3. Downloading the Library (with CUDA Compatibility)
+
+⚠️ Important Note on Large Files (Git LFS)
+This repository contains large binary files (e.g., .dll, datasets) managed by Git LFS (Large File Storage). Note that using "Download ZIP" will only provide the actual text files and small pointer files for the binaries, which must be replaced. To correctly obtain the full binary files, you must either clone the repository using an installed Git LFS client or manually download each large file from its corresponding page on GitHub.
 
 Navigate to the repository folder:
 
@@ -55,15 +51,6 @@ bin/
 Download two files:
 - CUDAprocessing.dll  
 - CUDAprocessing.h  
-
-### CUDA Compatibility Table
-
-Installed CUDA Toolkit | DLL Folder  
-----------------------|----------------  
-CUDA 10.2             | cuda-10_2/  
-CUDA 12.1             | cuda-12_1/  
-CUDA 12.6             | cuda-12_6/  
-CUDA 13.0             | cuda-13_0/  
 
 ---
 
