@@ -59,13 +59,6 @@ Download from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc
 ⚠️ Important Note on Large Files (Git LFS)
 This repository contains large binary files (e.g., .dll, datasets) managed by Git LFS (Large File Storage). Note that using "Download ZIP" will only provide the actual text files and small pointer files for the binaries, which must be replaced. To correctly obtain the full binary files, you must either clone the repository using an installed Git LFS client or manually download each large file from its corresponding page on GitHub.
 
-bin/  
-  v-1_0/  
-    cuda-10_2/  
-    cuda-12_1/  
-    cuda-12_6/  
-    cuda-13_0/  
-
 Download the `ODT_GPU.dll` file from the appropriate folder and the `ODT_GPU.h` file from `include/` directory.
 
 ### 6. Run the example script provided in the `examples/` directory to verify the setup (ensure the library version used in the script is compatible with the installed CUDA Toolkit version)
