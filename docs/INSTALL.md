@@ -5,7 +5,7 @@ This document describes the steps required to correctly install and configure th
 ## System Requirements
 
 - **Operating System:** Windows 10 / 11 (64-bit)
-- **GPU:** NVIDIA GPU supporting CUDA Technology
+- **GPU:** NVIDIA GPU supporting CUDA Technology (see CUDA version compatibility table below)
 - **Software:**
   - **MATLAB R2020a** or newer with MinGW-w64 C/C++ Compiler add-on
   - **NVIDIA CUDA Toolkit** (version matching the chosen DLL build, e.g. 10.2, 12.1, 12.6, 13.0)
