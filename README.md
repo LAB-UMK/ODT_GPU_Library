@@ -169,3 +169,8 @@ If you use this library in academic work, please cite:
 ## 📬 Contact
 For questions or collaboration inquiries, please contact:  
 📧 [mars@umk.pl]
+
+
+---
+
+© 2025 ODT GPU Library — For non-commercial research use only.
