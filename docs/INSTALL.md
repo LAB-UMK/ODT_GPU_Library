@@ -14,7 +14,7 @@ This document describes the steps required to correctly install and configure th
 ## GPU Compatibility per CUDA Toolkit Version
 
 Each DLL in the `bin/v-1_0/` directory is compiled with a specific CUDA Toolkit.
-The available GPU architectures depend on the corresponding CUDA version.
+The available GPU architectures depend on the corresponding CUDA version. Driver version must also be compatible with the selected CUDA Toolkit.
 
 | DLL version folder | CUDA Toolkit | Supported GPU architectures | Example GPUs |
 |--------------------|--------------|------------------------------|--------------|
@@ -73,6 +73,8 @@ If the files were moved or renamed, adjust these variables accordingly.
 
 Once the paths are confirmed, continue execution of the script.  
 If reconstruction appears, installation is correct.
+
+If MATLAB fails to load the DLL with the message “The specified module could not be found”, verify that the CUDA runtime libraries (e.g. `cudart64*.dll`, `cufft64_*.dll`) are visible in the system PATH.
 
 ---
 

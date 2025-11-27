@@ -1,49 +1,97 @@
-# Usage Guide
+# Usage Guide  
+ODT GPU Library — Compact Workflow Overview
 
-This guide describes the two main workflows supported by the ODT GPU Library and demonstrates their usage with example function sequences.
+This document provides a concise description of the two supported processing workflows. It is intended as a quick, practical reference for users integrating the library into their own software.
 
 ---
 
-## 1. Raw-data Workflow
+## 1. Raw-Data Workflow (from holograms)
 
-This workflow begins directly from raw holograms (detector data). It performs all preprocessing operations, such as reference correction, FFT windowing, and normalization, on the GPU.
+This workflow starts directly from raw detector holograms and performs preprocessing, K-space generation, and reconstruction on the GPU.
 
-### Example sequence:
+### Typical Call Sequence
+
 ```c
-HL_addReference(...);                           // optional reference
-HL00to02_FromPreprocToGenKO(...);               // hologram -> preprocessing -> K-space
-HL03_setParamsAndStartDIandGP(..., nGPi);       // reconstruction (Direct Inverse or iterative)
-HL04_takeReconstructionAndFreeMemory(...);      // get final reconstruction
+// (Optional) Upload reference hologram
+HL_addReference(hologram_ref, X, Y, nproj, NA, lambda, cam_pix, M, n_imm, do_NNC, fftWindowScale);
+
+// Raw holograms -> preprocessing -> K-space
+HL00to02_FromPreprocToGenKO(hologram, X, Y, nproj, NA, lambda, cam_pix, M, n_imm,
+                           do_NNC, &Kxy_dim, Kspace_oversampling_z,
+                           cosFactor, fftWindowScale, approxBornNotRytov);
+
+// Tomographic reconstruction (DI or GP)
+HL03_setParamsAndStartDIandGP(nGPi, do_TC, do_NNC, relaxM, betaM, kn_mean,
+                             objShift, objSupport);
+
+// Retrieve reconstruction and free GPU memory
+HL04_takeReconstructionAndFreeMemory(n_rec);
 ```
 
-**Key features:**
-- Input: raw holograms (`short int`)
-- Automatic preprocessing on GPU (FFT, filtering, windowing, normalization)
-- Optional reference handling (`HL_addReference()`)
-- Fastest and simplest path for real-time or automated processing
-- No access to intermediate data (sinograms, K-space)
+Each exported function is documented directly in the header file (ODT_GPU.h).
+
+
+### Key Notes
+- Input data: raw holograms (`int16` in MATLAB), dimensions `X × Y × nproj`.
+- `nGPi = 0` selects **Direct Inverse (DI)** reconstruction.
+- `nGPi > 0` selects **Gerchberg–Papoulis (GP)** iterative reconstruction.
+- This workflow is recommended for **real-time imaging and fast preview**.
+- Intermediate results (sinograms, K-space) are not exposed.
 
 ---
 
-## 2. Preprocessed-data Workflow
+## 2. Preprocessed-Data Workflow (from sinograms)
 
-This workflow begins from preprocessed sinograms (amplitude and phase). It allows precise control over all stages of the reconstruction and access to intermediate data.
+This workflow operates on externally prepared sinograms (amplitude and phase) and provides access to intermediate reconstruction data.
 
-### Example sequence:
+### Typical Call Sequence
+
 ```c
-HL_addReference(...);                           // optional reference
-HL01_setParams(...);
-HL02_sendDataAndGenerateKO(...);                // sinograms -> K-space
-HL03_setParamsAndStartDIandGP(..., nGPi);
-HL04_takeReconstructionAndFreeMemory(...);
-```
+// Set reconstruction and sampling parameters
+HL01_setParams(K_xy, K_z, dx, n_imm, n_proj, Nx, Ny,
+               dkP, dkPz, NA, lambda_all, kxp, kyp,
+               approxBornNotRytov);
 
-**Key features:**
-- Input: preprocessed sinograms (`float`)
-- User-controlled preprocessing (external or custom)
-- Optional reference handling (`HL_addReference()`)
-- Access to intermediate data (e.g., sinograms, K-space)
-- Ideal for research, analysis, and debugging
+// Upload sinograms and generate K-space
+HL02_sendDataAndGenerateKO(sinoAmp, sinoPh, FpmaskLogical);
+
+// Tomographic reconstruction (DI or GP)
+HL03_setParamsAndStartDIandGP(nGPi, do_TC, do_NNC, relaxM, betaM, kn_mean,
+                             objShift, objSupport);
+
+// Retrieve reconstruction and free GPU memory
+HL04_takeReconstructionAndFreeMemory(n_rec);
+
+```
+Each exported function is documented directly in the header file (ODT_GPU.h).
+
+### Key Notes
+- Input data: sinogram amplitude and phase (`float`).
+- This workflow allows **retrieval of intermediate data** such as K-space.
+- Recommended for **offline processing, debugging, and validation**.
+- Reconstruction mode is again controlled by `nGPi`.
 
 ---
 
+## 3. Direct Inverse vs. Gerchberg–Papoulis
+
+- **Direct Inverse (DI):** `nGPi = 0`
+  - Fastest reconstruction.
+  - Suitable for real-time preview.
+
+- **Gerchberg–Papoulis (GP):** `nGPi > 0`
+  - Iterative reconstruction.
+  - Higher quality at the cost of longer computation time.
+
+---
+
+## 4. MATLAB Integration Notes
+
+- Use `loadlibrary()` and `calllib()` to access the DLL.
+- Convert data to C-compatible types (`int16`, `single`).
+- Permute arrays if necessary to match the expected C memory layout.
+- Example MATLAB scripts for both workflows are provided with the library.
+
+---
+
+© 2025 ODT GPU Library — For non-commercial research use only.

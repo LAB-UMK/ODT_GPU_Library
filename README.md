@@ -147,17 +147,6 @@ The GPU-accelerated library presented here was developed in close collaboration 
 Although the numerical methods and data processing strategies differ fundamentally from the MATLAB implementation, the API structure and naming conventions were intentionally designed to remain compatible with it.  
 This approach facilitates direct comparison and validation of reconstruction results between the two environments while maintaining complete algorithmic and implementation independence.
 
-## 🧠 Requirements
-- **Operating system:** Windows 10 or 11 (64-bit)  
-- **GPU:** NVIDIA GPU with CUDA Compute Capability ≥ 7.5  
-- **CUDA Toolkit:** Supported builds  
-  - 10.2  
-  - 12.1  
-  - 12.6  
-  - 13.0  
-- **MATLAB** (optional, for example scripts)  
-- **Microsoft Visual C++ Redistributable packages for Visual Studio 2019** (for C/C++ integration)
-
 ---
 
 ## 📜 License
