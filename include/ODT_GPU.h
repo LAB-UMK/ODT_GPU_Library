@@ -634,7 +634,3 @@ EXPORTED_FUNCTION int cudaInitDev();
 #endif
 
 #endif
-
-// Info:
-// NonPositivity - not supported - nie dziala w matlabie, nie jestem
-// w stanie zasymulowac
