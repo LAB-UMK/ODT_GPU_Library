@@ -21,7 +21,7 @@ The available GPU architectures depend on the corresponding CUDA version.
 | `cuda-10_2`        | CUDA 10.2    | Kepler (SM 3.x), Maxwell (SM 5.x), Pascal (SM 6.x), Turing (SM 7.5), Ampere (SM 8.6\*) | GTX 750/960/1060, GTX 1650/1660, RTX 2060/2080, RTX 3060/3080 |
 | `cuda-12_1`        | CUDA 12.1    | Turing (SM 7.5), Ampere (SM 8.x), Ada Lovelace (SM 8.9) | RTX 2060/2080, RTX 3050–3090, RTX 4060–4090 |
 | `cuda-12_6`        | CUDA 12.6    | Same as Toolkit 12.1 (Turing+, Ampere, Ada) | RTX 20xx, 30xx, 40xx |
-| `cuda-13_0`        | CUDA 13.0    | Ampere (SM 8.x), Ada (SM 8.9), Blackwell (SM 9.0) **only** | RTX 30xx, 40xx, 50xx |
+| `cuda-13_0`        | CUDA 13.0    | Ampere (SM 8.x), Ada (SM 8.9), Blackwell (SM 9.0) | RTX 30xx, 40xx, 50xx |
 
 \* CUDA 10.2 unofficially works on some Ampere GPUs through updated drivers, but not guaranteed.
 
@@ -32,7 +32,7 @@ Newer GPUs (RTX 20xx/30xx/40xx/50xx) can use any of the 12.x or 13.x DLL version
 
 ---
 
-## Preparing the Environment
+## Running the MATLAB Example
 
 Although the example installation below is presented for MATLAB, the ODT GPU Library is a standard Windows DLL and can be used from any environment capable of calling external C functions.
 Typical options include:
@@ -40,7 +40,7 @@ Typical options include:
 - Python (via ctypes or cffi)
 - LabVIEW
 - C# / .NET
-- MATLAB (used here only as a reference workflow)
+- MATLAB (presented here)
 
 The following instructions describe the setup required to run the provided MATLAB examples.
 
@@ -50,6 +50,7 @@ The following instructions describe the setup required to run the provided MATLA
 This compiler is required by MATLAB to work with external DLL libraries via loadlibrary().  
 
 ### 3. Install the NVIDIA CUDA Toolkit (version 10.2, 12.1, 12.6, or 13.0 depending on your GPU and the compatibility table above)
+Download from: https://developer.nvidia.com/cuda-toolkit-archive
 
 ### 4. Install Microsoft Visual C++ Redistributable (x64)  
 Download from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
