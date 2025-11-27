@@ -66,7 +66,7 @@ bin/
     cuda-12_6/  
     cuda-13_0/  
 
-Download the ODT_GPU.dll file from the appropriate folder and the ODT_GPU.h file from "include" directory.
+Download the `ODT_GPU.dll` file from the appropriate folder and the `ODT_GPU.h` file from `include/` directory.
 
 ### 6. Run the example script provided in the `examples/` directory to verify the setup (ensure the library version used in the script is compatible with the installed CUDA Toolkit version)
 
