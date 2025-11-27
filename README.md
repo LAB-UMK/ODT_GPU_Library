@@ -46,7 +46,7 @@ The library is distributed as a precompiled dynamic-link library (DLL) that can 
 
 ## Installation
 
-💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
+💡 For detailed setup instructions see the [Installation Guide](docs/INSTALL.md).
 
 To use the ODT GPU Library, make sure the following components are installed:
 
@@ -62,7 +62,7 @@ To use the ODT GPU Library, make sure the following components are installed:
 5. Download ODT_GPU_Library (using Git LFS or manually download each binary file)
 6. Run the example script provided in the `examples/` directory to verify the setup (ensure the library version used in the script is compatible with the installed CUDA Toolkit version)
 
-💡 For detailed setup instructions and troubleshooting, see the [Installation Guide](docs/INSTALL.md).
+💡 For detailed setup instructions see the [Installation Guide](docs/INSTALL.md).
 
 ---
 
@@ -105,22 +105,6 @@ The library supports two main workflows:
 
 1. **Raw-data Workflow** — starting from detector holograms, performs full preprocessing and reconstruction directly on the GPU.
 2. **Preprocessed-data Workflow** — starts from preprocessed sinograms, offering fine control and access to intermediate data.
-
-### Example sequence:
-
-**Raw-data Workflow**
-```c
-HL_addReference(...);                           // optional reference
-HL00to02_FromPreprocToGenKO(...);               // hologram -> preprocessing -> K-space
-HL03_setParamsAndStartDIandGP(...);       		// reconstruction (Direct Inverse or iterative)
-HL04_takeReconstructionAndFreeMemory(...);      // get final reconstruction
-```
-
-✅ **Key features:**
-- Input: raw holograms (`short int`)
-- Automatic preprocessing (FFT, filtering, windowing, normalization)
-- Optional reference handling (`HL_addReference()`)
-- Fastest and simplest path for real-time or automated processing
 
 For detailed step-by-step examples of both workflows, see the [Usage Guide](docs/USAGE.md).
 
