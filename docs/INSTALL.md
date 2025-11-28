@@ -30,6 +30,8 @@ If you have one of these cards, you must use the `cuda-10_2` DLL.
 
 Newer GPUs (RTX 20xx/30xx/40xx/50xx) can use any of the 12.x or 13.x DLL versions.
 
+The library has been tested on the following NVIDIA GPUs: RTX 2050, RTX 3070, and RTX Pro 500 (laptops), as well as GTX 1080, RTX 3090, and RTX 4090 (workstations). Other CUDA-compatible GPUs should also work but have not been explicitly tested.
+
 ---
 
 ## Running the MATLAB Example
