@@ -47,7 +47,7 @@ extern "C" {
  *
  * Transfers a reference hologram (raw data) from host memory to GPU device memory.
  * The stored reference is reused by subsequent processing steps (e.g., for background/reference
- * subtraction or normalization) until explicitly removed via HL00_removeReference().
+ * subtraction or normalization) until explicitly removed via HL_removeReference().
  *
  * @param hologram             Pointer to the reference hologram stored as int16 (short int).
  *                             Expected layout: contiguous array with dimensions [_X * _Y * _nproj].
@@ -71,22 +71,28 @@ extern "C" {
  *
  * @return 0 on success; non-zero error code on failure (e.g., invalid parameters, insufficient GPU memory).
  *
- * @note The function stores the reference hologram on the GPU until HL00_removeReference() is called.
+ * @note The function stores the reference hologram on the GPU until HL_removeReference() is called.
  *       Ensure that the memory layout of `hologram` matches the expectations of the rest of the pipeline.
  * @note If calling from MATLAB, convert data to int16 (short) using an appropriate conversion helper
  *       (e.g., convertIntMatrixForC). Be mindful of MATLAB column-major vs. C row-major ordering if applicable.
  *
- * @see HL00_removeReference, preproc_sendHologram, HL00to02_FromPreprocToGenKO
+ * @see HL_removeReference, preproc_sendHologram, HL00to02_FromPreprocToGenKO
  */
-	EXPORTED_FUNCTION int HL00_addReference(short int *hologram, int _X, int _Y, int _nproj, float _NA, float lambda,
+	EXPORTED_FUNCTION int HL_addReference(short int *hologram, int _X, int _Y, int _nproj, float _NA, float lambda,
 		float cam_pix, float M, float _n_imm, int _do_NNC, float _fftWindowsScale);
+		
+// Backward compatibility alias:
+// This macro preserves compatibility with older code that used the legacy
+// function name HL00_addReference. The canonical API function name is now
+// HL_addReference.
+	#define HL00_addReference HL_addReference
 		
 		
 /**
  * @brief Retrieve the reference sinogram amplitude data from GPU memory.
  *
  * This function copies the **amplitude component** of the reference sinogram
- * (previously generated from the reference hologram via HL00_addReference)
+ * (previously generated from the reference hologram via HL_addReference)
  * from GPU device memory to host memory.
  *
  * It is primarily intended for diagnostic or debugging purposes,
@@ -98,18 +104,18 @@ extern "C" {
  *                             The expected size of the array is determined
  *                             by the dimensions of the reference dataset:
  *                             `_X * _Y * _nproj` elements, as specified
- *                             when calling HL00_addReference().
+ *                             when calling HL_addReference().
  *
  * @return 0 on success; non-zero error code if data transfer fails or
  *         if the reference sinogram is not available in GPU memory.
  *
  * @note The function does not modify or free the reference data stored on the GPU.
- *       The reference sinogram remains available until HL00_removeReference() is called.
- * @note Ensure that HL00_addReference() was successfully executed prior to calling this function.
+ *       The reference sinogram remains available until HL_removeReference() is called.
+ * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
  * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
  *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
  *
- * @see HL00_addReference, HL00_B_optionTakeSinoPhRef, HL00_removeReference
+ * @see HL_addReference, HL00_B_optionTakeSinoPhRef, HL_removeReference
  */		
 	EXPORTED_FUNCTION int HL00_B_optionTakeSinoAmpRef(float *sinAmpRef_host);
 	
@@ -118,7 +124,7 @@ extern "C" {
  * @brief Retrieve the reference sinogram phase data from GPU memory.
  *
  * This function copies the **phase component** of the reference sinogram
- * (previously generated from the reference hologram via HL00_addReference)
+ * (previously generated from the reference hologram via HL_addReference)
  * from GPU device memory to host memory.
  *
  * It is primarily intended for diagnostic or verification purposes,
@@ -130,18 +136,18 @@ extern "C" {
  *                             The expected size of the array is determined
  *                             by the dimensions of the reference dataset:
  *                             `_X * _Y * _nproj` elements, as specified
- *                             when calling HL00_addReference().
+ *                             when calling HL_addReference().
  *
  * @return 0 on success; non-zero error code if data transfer fails or
  *         if the reference sinogram is not available in GPU memory.
  *
  * @note The function does not modify or free the reference data stored on the GPU.
- *       The reference sinogram remains available until HL00_removeReference() is called.
- * @note Ensure that HL00_addReference() was successfully executed prior to calling this function.
+ *       The reference sinogram remains available until HL_removeReference() is called.
+ * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
  * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
  *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
  *
- * @see HL00_addReference, HL00_B_optionTakeSinoAmpRef, HL00_removeReference
+ * @see HL_addReference, HL00_B_optionTakeSinoAmpRef, HL_removeReference
  */
 	EXPORTED_FUNCTION int HL00_B_optionTakeSinoPhRef(float *sinPhRef_host);
 	
@@ -149,7 +155,7 @@ extern "C" {
  * @brief Remove the reference hologram and associated sinogram data from GPU memory.
  *
  * This function releases all GPU memory previously allocated for the reference dataset
- * added via HL00_addReference(). It removes both the amplitude and phase components
+ * added via HL_addReference(). It removes both the amplitude and phase components
  * of the reference sinogram and all intermediate buffers related to reference preprocessing.
  *
  * After this call, the reference data is no longer available for subsequent processing steps.
@@ -163,9 +169,12 @@ extern "C" {
  * @note It is safe to call this function even if the reference data has already been removed —
  *       redundant calls will have no effect beyond returning an appropriate status code.
  *
- * @see HL00_addReference, HL00_B_optionTakeSinoAmpRef, HL00_B_optionTakeSinoPhRef
+ * @see HL_addReference, HL00_B_optionTakeSinoAmpRef, HL00_B_optionTakeSinoPhRef
  */
-	EXPORTED_FUNCTION int HL00_removeReference();
+	EXPORTED_FUNCTION int HL_removeReference();
+	
+// Backward compatibility alias for legacy API name:
+#define HL00_removeReference HL_removeReference	
 
 
 /**
@@ -177,7 +186,7 @@ extern "C" {
  * processing stages (HL00–HL02) into a single call for maximum efficiency.
  *
  * The function performs normalization using the reference hologram previously loaded
- * with HL00_addReference(), applies filtering, performs Fourier transforms, and constructs
+ * with HL_addReference(), applies filtering, performs Fourier transforms, and constructs
  * the three-dimensional K-space representation of the measured object.
  *
  * This combined mode is primarily intended for **real-time imaging** and **fast data pipelines**, 
@@ -222,13 +231,13 @@ extern "C" {
  * @return 0 on success; non-zero error code on failure (e.g., invalid parameters, insufficient GPU memory,
  *         or missing reference data if required).
  *
- * @note The function internally performs preprocessing equivalent to HL00_addReference(), HL01_setParams
+ * @note The function internally performs preprocessing equivalent to HL_addReference(), HL01_setParams
  *       and HL02_sendDataAndGenerateKO(), and thus does not require separate calls to these functions.
  * @note The resulting K-space data is stored in GPU memory for subsequent reconstruction steps,
  *       typically performed using HL03_setParamsAndStartDIandGP() followed by HL04_takeReconstructionAndFreeMemory().
  * @note The parameter `_K_xy` must point to a valid integer variable; its value is updated on return.
  *
- * @see HL00_addReference, HL03_setParamsAndStartDIandGP, HL04_takeReconstructionAndFreeMemory
+ * @see HL_addReference, HL03_setParamsAndStartDIandGP, HL04_takeReconstructionAndFreeMemory
  */
 	EXPORTED_FUNCTION int HL00to02_FromPreprocToGenKO(short int *hologram, int X, int Y, int _nproj, float NA, float lambda,
 		float cam_pix, float M, float _n_imm, int _do_NNC, int* _K_xy, int Kspace_oversampling_z, float _cosFactor, float _fftWindowsScale, int _approxBornNotRytov);
