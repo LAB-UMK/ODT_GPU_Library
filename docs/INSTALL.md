@@ -1,6 +1,6 @@
-# Installation Guide  
+﻿# Installation Guide  
 
-This document describes the steps required to correctly install and configure the ODT GPU Library for use with MATLAB and CUDA-based systems.
+This document describes the steps required to correctly install and configure the ODT GPU Library for use with MATLAB and CUDA-based systems. Instructions for rebuilding the library from source are provided at the end of this document.
 
 ## System Requirements
 
@@ -10,6 +10,7 @@ This document describes the steps required to correctly install and configure th
   - **MATLAB R2020a** or newer with MinGW-w64 C/C++ Compiler add-on
   - **NVIDIA CUDA Toolkit** (version matching the chosen DLL build, e.g. 10.2, 12.1, 12.6, 13.0)
   - **Microsoft Visual C++ Redistributable Package (x64)**
+  - **Visual Studio 2022** with the *Desktop development with C++* workload — only required when building from source
 
 ## GPU Compatibility per CUDA Toolkit Version
 
@@ -78,4 +79,58 @@ If MATLAB fails to load the DLL with the message “The specified module could n
 
 ---
 
-© 2025 ODT GPU Library — For non-commercial research use only.
+## Building the Library from Source
+
+Rebuilding is **optional** — precompiled DLLs are provided in `bin/`. Building from source is useful for inspecting the implementation, modifying the algorithms, or targeting a CUDA Toolkit version other than the ones provided.
+
+### Prerequisites
+
+- **Visual Studio 2022** with the *Desktop development with C++* workload
+- **NVIDIA CUDA Toolkit 12.6** (or another version — see below)
+
+Install Visual Studio **before** the CUDA Toolkit. The CUDA installer integrates with Visual Studio and adds the build customizations required to compile `.cu` files; if CUDA is installed first, the integration may be missing and the project will fail to load its CUDA build rules.
+
+### Build Steps
+
+1. Open `src/ODT_GPU/ODT_GPU.sln` in Visual Studio 2022.
+2. Select the **Release | x64** configuration from the toolbar.
+3. Build the solution (**Build → Build Solution**, or `Ctrl+Shift+B`).
+
+The compiled `ODT_GPU.dll` is written to the configuration output directory (e.g. `src/ODT_GPU/x64/Release/`).
+
+### Building against a different CUDA Toolkit version
+
+The project references **CUDA 12.6** by default. To build against a different installed version:
+
+1. Right-click the **ODT_GPU** project in Solution Explorer.
+2. Select **Build Dependencies → Build Customizations…**
+3. Uncheck the current CUDA entry, check the version installed on your system, and confirm.
+
+Include and library directories are resolved through the `$(CUDA_PATH)` environment variable set by the CUDA installer, so no manual path editing is required.
+
+### GPU Architectures
+
+The project is configured to generate code for compute capabilities 6.1 through 9.0, plus PTX for forward compatibility with future architectures. To target a narrower set of GPUs and shorten build times, edit **Project Properties → CUDA C/C++ → Device → Code Generation**.
+
+### Optional Debug and Profiling Output
+
+The source includes optional instrumentation for dumping intermediate data to disk and reporting per-step execution times. It is disabled by default. To enable it, uncomment the relevant `#define` directives at the top of `src/ODT_GPU/ODT_GPU.h` and rebuild:
+
+```c
+//#define Save_data
+//#define Save_data2
+//#define Save_timings
+//#define Save_timings_GP
+```
+
+The output files are written to the current working directory of the host application.
+
+### Troubleshooting
+
+- **“Cannot find CUDA 12.6.props”** — the CUDA Toolkit version referenced by the project is not installed. Either install CUDA 12.6 or switch the build customization as described above.
+- **Unresolved external symbols referring to `cufft` or `cudart`** — verify that `CUDA_PATH` is set in the system environment and points to the installed toolkit.
+- **Project fails to load `.cu` files** — reinstall the CUDA Toolkit after Visual Studio so that the Visual Studio integration is registered.
+
+---
+
+© 2025–2026 ODT GPU Library — Licensed under the GNU General Public License v3.0.

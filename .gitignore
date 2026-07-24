@@ -1,0 +1,55 @@
+# Visual Studio build output
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/[Dd]ebug/
+[Bb]in/[Rr]elease/
+[Oo]bj/
+
+# Visual Studio user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+
+# Build artifacts
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.idb
+*.tlog
+*.log
+*.lastbuildstate
+*.iobj
+*.ipdb
+*.recipe
+
+# Precompiled headers
+*.pch
+*.gch
+
+# CUDA intermediate files
+*.cu.obj
+*.cudafe*
+*.fatbin*
+*.ptx
+*.cubin
+*.sm_*.cubin
+*.module_id
+*.gpu
+*.stub.c
+
+# MATLAB
+*.asv
+*.m~
+slprj/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

@@ -1,15 +1,22 @@
-/**
- * @file CUDAprocessing.h
+﻿/**
+ * @file ODT_GPU.h
  * @brief Header file for the GPU-accelerated library for real-time limited-angle optical diffraction tomography (LaODT).
  *
  * This library provides a complete set of high-level functions (HLxx) and supporting GPU procedures
  * for tomographic reconstruction using Direct Inverse and Gerchberg–Papoulis algorithms.
  * It enables fast 3D imaging with adjustable reconstruction parameters and real-time preview capabilities.
  *
- * The library is distributed as a compiled dynamic-link library (DLL) for non-commercial scientific use.
+ * This library is distributed as an open-source project under the GPL-3.0 license.
  *
- * @version 1.0
+ * @note This is a simplified version of the library header, containing only
+ *       the core high-level functions (HL00-HL04) recommended for typical use
+ *       with the compiled DLL. The complete header - including optional
+ *       diagnostic functions and the legacy low-level API - is available
+ *       in the source directory: src/ODT_GPU.h.
+ *
+ * @version 1.1
  * @date 2025
+ * @author
  *   - Marcin Sylwestrzak (Nicolaus Copernicus University, Toruń, Poland)
  *   - Wojciech Krauze (Warsaw University of Technology, Warsaw, Poland)
  *   - Paweł Ossowski (Nicolaus Copernicus University, Toruń, Poland)
@@ -19,28 +26,28 @@
  *   - Małgorzata Kujawińska (Warsaw University of Technology, Warsaw, Poland)
  *   - Maciej Szkulmowski (Nicolaus Copernicus University, Toruń, Poland)
  * @copyright
- * This software is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0).
- * See the LICENSE file or visit https://creativecommons.org/licenses/by-nc-nd/4.0/ for details.
+ * This software is licensed under the GNU General Public License v3.0 (GPL-3.0).
+ * See the LICENSE file or visit https://www.gnu.org/licenses/gpl-3.0.html for details.
  *
  * @see The full project repository and documentation are available at:
  *      https://github.com/LAB-UMK/ODT_GPU_Library
  */
 
-#ifndef CUDAPROCESSING_H
-#define CUDAPROCESSING_H
+#ifndef ODT_GPU_H
+#define ODT_GPU_H
 
 #include "helper.h"
-
-//#define Save_timings
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-// =============================================================================================
-//  HIGH-LEVEL FUNCTIONS (HL00–HL04) — main reconstruction pipeline
-// =============================================================================================
 
+	// =============================================================================================
+	//  CORE WORKFLOW FUNCTIONS
+	//  Main reconstruction pipeline. Call in the order listed below.
+	//  HL00_addReference and HL00_removeReference are backward compatibility aliases.
+	// =============================================================================================
 
 /**
  * @brief Add a reference hologram to GPU memory for later reuse.
@@ -80,78 +87,14 @@ extern "C" {
  */
 	EXPORTED_FUNCTION int HL_addReference(short int *hologram, int _X, int _Y, int _nproj, float _NA, float lambda,
 		float cam_pix, float M, float _n_imm, int _do_NNC, float _fftWindowsScale);
-		
+
 // Backward compatibility alias:
 // This macro preserves compatibility with older code that used the legacy
 // function name HL00_addReference. The canonical API function name is now
 // HL_addReference.
 	EXPORTED_FUNCTION int HL00_addReference(short int *hologram, int _X, int _Y, int _nproj, float _NA, float lambda,
 		float cam_pix, float M, float _n_imm, int _do_NNC, float _fftWindowsScale);
-		
-		
-/**
- * @brief Retrieve the reference sinogram amplitude data from GPU memory.
- *
- * This function copies the **amplitude component** of the reference sinogram
- * (previously generated from the reference hologram via HL_addReference)
- * from GPU device memory to host memory.
- *
- * It is primarily intended for diagnostic or debugging purposes,
- * or when the user wishes to inspect or reuse the reference sinogram amplitude
- * in external software (e.g., MATLAB or Python).
- *
- * @param sinAmpRef_host       Pointer to a preallocated host array (float*)
- *                             that will receive the amplitude data.
- *                             The expected size of the array is determined
- *                             by the dimensions of the reference dataset:
- *                             `_X * _Y * _nproj` elements, as specified
- *                             when calling HL_addReference().
- *
- * @return 0 on success; non-zero error code if data transfer fails or
- *         if the reference sinogram is not available in GPU memory.
- *
- * @note The function does not modify or free the reference data stored on the GPU.
- *       The reference sinogram remains available until HL_removeReference() is called.
- * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
- * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
- *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
- *
- * @see HL_addReference, HL00_B_optionTakeSinoPhRef, HL_removeReference
- */		
-	EXPORTED_FUNCTION int HL00_B_optionTakeSinoAmpRef(float *sinAmpRef_host);
-	
-	
-	/**
- * @brief Retrieve the reference sinogram phase data from GPU memory.
- *
- * This function copies the **phase component** of the reference sinogram
- * (previously generated from the reference hologram via HL_addReference)
- * from GPU device memory to host memory.
- *
- * It is primarily intended for diagnostic or verification purposes,
- * or when the user wishes to analyze or visualize the reference sinogram phase
- * in external software (e.g., MATLAB or Python).
- *
- * @param sinPhRef_host        Pointer to a preallocated host array (float*)
- *                             that will receive the phase data.
- *                             The expected size of the array is determined
- *                             by the dimensions of the reference dataset:
- *                             `_X * _Y * _nproj` elements, as specified
- *                             when calling HL_addReference().
- *
- * @return 0 on success; non-zero error code if data transfer fails or
- *         if the reference sinogram is not available in GPU memory.
- *
- * @note The function does not modify or free the reference data stored on the GPU.
- *       The reference sinogram remains available until HL_removeReference() is called.
- * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
- * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
- *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
- *
- * @see HL_addReference, HL00_B_optionTakeSinoAmpRef, HL_removeReference
- */
-	EXPORTED_FUNCTION int HL00_B_optionTakeSinoPhRef(float *sinPhRef_host);
-	
+
 	/**
  * @brief Remove the reference hologram and associated sinogram data from GPU memory.
  *
@@ -173,10 +116,9 @@ extern "C" {
  * @see HL_addReference, HL00_B_optionTakeSinoAmpRef, HL00_B_optionTakeSinoPhRef
  */
 	EXPORTED_FUNCTION int HL_removeReference();
-	
+
 // Backward compatibility alias for legacy API name:
 	EXPORTED_FUNCTION int HL00_removeReference();
-
 
 /**
  * @brief Perform complete preprocessing and K-space generation from raw hologram data
@@ -243,7 +185,6 @@ extern "C" {
 	EXPORTED_FUNCTION int HL00to02_FromPreprocToGenKO(short int *hologram, int X, int Y, int _nproj, float NA, float lambda,
 		float cam_pix, float M, float _n_imm, int _do_NNC, int* _K_xy, int Kspace_oversampling_z, float _cosFactor, float _fftWindowsScale, int _approxBornNotRytov);
 
-
 /**
  * @brief Initialize and allocate GPU resources for tomographic reconstruction.
  *
@@ -296,7 +237,6 @@ extern "C" {
  */
 	EXPORTED_FUNCTION int HL01_setParams(int _K_xy, int _K_z, float _dx, float _n_imm, int _n_proj, int _Nx, int _Ny,
 		float _dkP, float _dkPz, float _NA, float* _lambda_all, float* _kxp, float* _kyp, int _approxBornNotRytov);
-		
 
 /**
  * @brief Send sinogram data to the GPU and generate the K-space representation of the object.
@@ -342,98 +282,6 @@ extern "C" {
  *      HL02_B_optionTakeKO, HL02_B_optionTakeEW, HL02_C_optionFreeGPUmemory
  */
 	EXPORTED_FUNCTION int HL02_sendDataAndGenerateKO(float* _sinoAmp, float* _sinoPh, unsigned char *FpmaskLogical);
-	
-/**
- * @brief Retrieve the generated K-space data from GPU memory to the host.
- *
- * This function copies the complex-valued K-space data (Fourier domain representation of the object)
- * from GPU device memory to the host memory. It allows the user to access the spectral data
- * after K-space generation (performed by HL02_sendDataAndGenerateKO or HL00to02_FromPreprocToGenKO),
- * for verification, debugging, or visualization purposes.
- *
- * The K-space data represents the 3D Fourier transform of the measured sinograms,
- * containing both amplitude and phase information stored as interleaved real and imaginary values.
- *
- * @param _complexData_host     Pointer to a preallocated host array (float*) that will receive
- *                              the complex K-space data.  
- *                              The expected array length is `2 * _K_xy * _K_xy * _K_z`,  
- *                              where factor 2 accounts for real and imaginary components
- *                              stored in alternating order: `[Re0, Im0, Re1, Im1, …]`.
- *
- * @return 0 on success; non-zero error code on failure (e.g., missing data in GPU memory
- *         or invalid pointer).
- *
- * @note The K-space data must already exist in GPU memory before calling this function.
- *       It is generated by either HL02_sendDataAndGenerateKO() (multi-step mode)
- *       or HL00to02_FromPreprocToGenKO() (simplified mode mode).
- * @note The function does not modify or free GPU memory — it only performs data transfer.
- * @note When calling from MATLAB, ensure the host array is of type `single`
- *       and has sufficient size to hold all real and imaginary components.
- *
- * @see HL02_sendDataAndGenerateKO, HL00to02_FromPreprocToGenKO,
- *      HL02_B_optionTakeEW, HL02_C_optionFreeGPUmemory
- */
-	EXPORTED_FUNCTION int HL02_B_optionTakeKO(float *_complexData_host);
-	
-	
-	/**
- * @brief Retrieve the Ewald-sphere index map or equivalent wave-vector mask from GPU memory.
- *
- * This function copies the integer array representing the Ewald-sphere geometry
- * wave-vector indices (EW array) from GPU device memory to the host. The EW array encodes
- * the mapping between the K-space coordinates and the illumination geometry used during
- * optical diffraction tomography (ODT) data acquisition.
- *
- * In practical terms, it allows the user to inspect which regions of the 3D K-space are filled
- * with measured data, and which remain empty due to the limited angular coverage of the system.
- * Such information is particularly useful for diagnostic visualization or reconstruction validation.
- *
- * @param ew_host               Pointer to a preallocated integer array (int*) on the host side,
- *                              which will receive the EW (Ewald-sphere) index map.  
- *                              The expected array length corresponds to the full size of the
- *                              generated K-space grid: `_K_xy * _K_xy * _K_z`.
- *
- * @return 0 on success; non-zero error code on failure (e.g., EW data not available in GPU memory
- *         or invalid pointer).
- *
- * @note The EW array must already exist in GPU memory prior to calling this function.
- *       It is generated internally by HL02_sendDataAndGenerateKO() or
- *       HL00to02_FromPreprocToGenKO() during K-space construction.
- * @note Each integer value in the EW array typically corresponds to a specific projection index
- *       (illumination angle) or may encode a binary occupancy flag, depending on implementation.
- * @note The function only performs a data transfer; it does not modify or free GPU memory.
- * @note When calling from MATLAB, ensure that the receiving array is of type `int32`.
- *
- * @see HL02_sendDataAndGenerateKO, HL02_B_optionTakeKO, HL02_C_optionFreeGPUmemory
- */
-	EXPORTED_FUNCTION int HL02_B_optionTakeEW(int *ew_host);
-	
-/**
- * @brief Free GPU memory allocated during K-space generation.
- *
- * This function releases all GPU memory buffers that were allocated for
- * K-space generation and related intermediate data structures (e.g., sinograms,
- * masks, Ewald-sphere maps). It should be called when the user has completed
- * data processing at the K-space stage and no further reconstruction (DI/GP)
- * will be performed.
- *
- * @return 0 on success; non-zero error code on failure (e.g., invalid device context
- *         or already released memory).
- *
- * @note After calling this function, any attempt to access previously generated
- *       K-space or Ewald-sphere data (e.g., via HL02_B_optionTakeKO or HL02_B_optionTakeEW)
- *       will result in an error, as the associated GPU memory has been deallocated.
- * @note If the reconstruction step (HL03_setParamsAndStartDIandGP) will be executed,
- *       do not call this function — GPU memory will be automatically reused and released
- *       by HL04_takeReconstructionAndFreeMemory().
- * @note It is safe to call this function multiple times; redundant calls will have no effect
- *       beyond returning an appropriate status code.
- *
- * @see HL02_sendDataAndGenerateKO, HL02_B_optionTakeKO, HL02_B_optionTakeEW,
- *      HL04_takeReconstructionAndFreeMemory
- */
-	EXPORTED_FUNCTION int HL02_C_optionFreeGPUmemory();		
-
 
 /**
  * @brief Configure reconstruction parameters and start the tomographic reconstruction
@@ -539,7 +387,7 @@ extern "C" {
  *      HL02_C_optionFreeGPUmemory
  */
 	EXPORTED_FUNCTION int HL04_takeReconstructionAndFreeMemory(float *complexData_host);
-	
+
 /**
  * @brief Retrieve a single axial slice (magnitude) from the reconstructed 3D volume and release GPU memory.
  *
@@ -569,12 +417,168 @@ extern "C" {
 EXPORTED_FUNCTION int HL04a_takeRecSingleSliceAndFreeMemory(float *singleSlice_host, int noOfSlice);
 
 
+	// =============================================================================================
+	//  OPTIONAL / DIAGNOSTIC FUNCTIONS
+	//  Not part of the standard reconstruction workflow.
+	//  Primarily used for validation, debugging, and intermediate data inspection.
+	// =============================================================================================
+
+/**
+ * @brief Retrieve the reference sinogram amplitude data from GPU memory.
+ *
+ * This function copies the **amplitude component** of the reference sinogram
+ * (previously generated from the reference hologram via HL_addReference)
+ * from GPU device memory to host memory.
+ *
+ * It is primarily intended for diagnostic or debugging purposes,
+ * or when the user wishes to inspect or reuse the reference sinogram amplitude
+ * in external software (e.g., MATLAB or Python).
+ *
+ * @param sinAmpRef_host       Pointer to a preallocated host array (float*)
+ *                             that will receive the amplitude data.
+ *                             The expected size of the array is determined
+ *                             by the dimensions of the reference dataset:
+ *                             `_X * _Y * _nproj` elements, as specified
+ *                             when calling HL_addReference().
+ *
+ * @return 0 on success; non-zero error code if data transfer fails or
+ *         if the reference sinogram is not available in GPU memory.
+ *
+ * @note The function does not modify or free the reference data stored on the GPU.
+ *       The reference sinogram remains available until HL_removeReference() is called.
+ * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
+ * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
+ *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
+ *
+ * @see HL_addReference, HL00_B_optionTakeSinoPhRef, HL_removeReference
+ */		
+	EXPORTED_FUNCTION int HL00_B_optionTakeSinoAmpRef(float *sinAmpRef_host);
+
+	/**
+ * @brief Retrieve the reference sinogram phase data from GPU memory.
+ *
+ * This function copies the **phase component** of the reference sinogram
+ * (previously generated from the reference hologram via HL_addReference)
+ * from GPU device memory to host memory.
+ *
+ * It is primarily intended for diagnostic or verification purposes,
+ * or when the user wishes to analyze or visualize the reference sinogram phase
+ * in external software (e.g., MATLAB or Python).
+ *
+ * @param sinPhRef_host        Pointer to a preallocated host array (float*)
+ *                             that will receive the phase data.
+ *                             The expected size of the array is determined
+ *                             by the dimensions of the reference dataset:
+ *                             `_X * _Y * _nproj` elements, as specified
+ *                             when calling HL_addReference().
+ *
+ * @return 0 on success; non-zero error code if data transfer fails or
+ *         if the reference sinogram is not available in GPU memory.
+ *
+ * @note The function does not modify or free the reference data stored on the GPU.
+ *       The reference sinogram remains available until HL_removeReference() is called.
+ * @note Ensure that HL_addReference() was successfully executed prior to calling this function.
+ * @note When calling from MATLAB, provide a single-precision (`single`) preallocated array
+ *       of appropriate size (e.g., using `libpointer('singlePtr', zeros(...,'single'))`).
+ *
+ * @see HL_addReference, HL00_B_optionTakeSinoAmpRef, HL_removeReference
+ */
+	EXPORTED_FUNCTION int HL00_B_optionTakeSinoPhRef(float *sinPhRef_host);
+
+/**
+ * @brief Retrieve the generated K-space data from GPU memory to the host.
+ *
+ * This function copies the complex-valued K-space data (Fourier domain representation of the object)
+ * from GPU device memory to the host memory. It allows the user to access the spectral data
+ * after K-space generation (performed by HL02_sendDataAndGenerateKO or HL00to02_FromPreprocToGenKO),
+ * for verification, debugging, or visualization purposes.
+ *
+ * The K-space data represents the 3D Fourier transform of the measured sinograms,
+ * containing both amplitude and phase information stored as interleaved real and imaginary values.
+ *
+ * @param _complexData_host     Pointer to a preallocated host array (float*) that will receive
+ *                              the complex K-space data.  
+ *                              The expected array length is `2 * _K_xy * _K_xy * _K_z`,  
+ *                              where factor 2 accounts for real and imaginary components
+ *                              stored in alternating order: `[Re0, Im0, Re1, Im1, …]`.
+ *
+ * @return 0 on success; non-zero error code on failure (e.g., missing data in GPU memory
+ *         or invalid pointer).
+ *
+ * @note The K-space data must already exist in GPU memory before calling this function.
+ *       It is generated by either HL02_sendDataAndGenerateKO() (multi-step mode)
+ *       or HL00to02_FromPreprocToGenKO() (simplified mode mode).
+ * @note The function does not modify or free GPU memory — it only performs data transfer.
+ * @note When calling from MATLAB, ensure the host array is of type `single`
+ *       and has sufficient size to hold all real and imaginary components.
+ *
+ * @see HL02_sendDataAndGenerateKO, HL00to02_FromPreprocToGenKO,
+ *      HL02_B_optionTakeEW, HL02_C_optionFreeGPUmemory
+ */
+	EXPORTED_FUNCTION int HL02_B_optionTakeKO(float *_complexData_host);
+
+	/**
+ * @brief Retrieve the Ewald-sphere index map or equivalent wave-vector mask from GPU memory.
+ *
+ * This function copies the integer array representing the Ewald-sphere geometry
+ * wave-vector indices (EW array) from GPU device memory to the host. The EW array encodes
+ * the mapping between the K-space coordinates and the illumination geometry used during
+ * optical diffraction tomography (ODT) data acquisition.
+ *
+ * In practical terms, it allows the user to inspect which regions of the 3D K-space are filled
+ * with measured data, and which remain empty due to the limited angular coverage of the system.
+ * Such information is particularly useful for diagnostic visualization or reconstruction validation.
+ *
+ * @param ew_host               Pointer to a preallocated integer array (int*) on the host side,
+ *                              which will receive the EW (Ewald-sphere) index map.  
+ *                              The expected array length corresponds to the full size of the
+ *                              generated K-space grid: `_K_xy * _K_xy * _K_z`.
+ *
+ * @return 0 on success; non-zero error code on failure (e.g., EW data not available in GPU memory
+ *         or invalid pointer).
+ *
+ * @note The EW array must already exist in GPU memory prior to calling this function.
+ *       It is generated internally by HL02_sendDataAndGenerateKO() or
+ *       HL00to02_FromPreprocToGenKO() during K-space construction.
+ * @note Each integer value in the EW array typically corresponds to a specific projection index
+ *       (illumination angle) or may encode a binary occupancy flag, depending on implementation.
+ * @note The function only performs a data transfer; it does not modify or free GPU memory.
+ * @note When calling from MATLAB, ensure that the receiving array is of type `int32`.
+ *
+ * @see HL02_sendDataAndGenerateKO, HL02_B_optionTakeKO, HL02_C_optionFreeGPUmemory
+ */
+	EXPORTED_FUNCTION int HL02_B_optionTakeEW(int *ew_host);
+
+/**
+ * @brief Free GPU memory allocated during K-space generation.
+ *
+ * This function releases all GPU memory buffers that were allocated for
+ * K-space generation and related intermediate data structures (e.g., sinograms,
+ * masks, Ewald-sphere maps). It should be called when the user has completed
+ * data processing at the K-space stage and no further reconstruction (DI/GP)
+ * will be performed.
+ *
+ * @return 0 on success; non-zero error code on failure (e.g., invalid device context
+ *         or already released memory).
+ *
+ * @note After calling this function, any attempt to access previously generated
+ *       K-space or Ewald-sphere data (e.g., via HL02_B_optionTakeKO or HL02_B_optionTakeEW)
+ *       will result in an error, as the associated GPU memory has been deallocated.
+ * @note If the reconstruction step (HL03_setParamsAndStartDIandGP) will be executed,
+ *       do not call this function — GPU memory will be automatically reused and released
+ *       by HL04_takeReconstructionAndFreeMemory().
+ * @note It is safe to call this function multiple times; redundant calls will have no effect
+ *       beyond returning an appropriate status code.
+ *
+ * @see HL02_sendDataAndGenerateKO, HL02_B_optionTakeKO, HL02_B_optionTakeEW,
+ *      HL04_takeReconstructionAndFreeMemory
+ */
+	EXPORTED_FUNCTION int HL02_C_optionFreeGPUmemory();		
 
 
-// =============================================================================================
-//  UTILITY AND DEBUG FUNCTIONS
-// =============================================================================================
-
+	// =============================================================================================
+	//  UTILITY FUNCTIONS
+	// =============================================================================================
 
 
 /**
@@ -602,14 +606,13 @@ EXPORTED_FUNCTION int HL04a_takeRecSingleSliceAndFreeMemory(float *singleSlice_h
  * @code
  * freeMB  = libpointer('int32Ptr', 0);
  * totalMB = libpointer('int32Ptr', 0);
- * err = calllib('CUDAprocessing', 'memoryInfo', freeMB, totalMB);
+ * err = calllib('ODT_GPU', 'memoryInfo', freeMB, totalMB);
  * fprintf('Free: %d MB / Total: %d MB\n', freeMB.Value, totalMB.Value);
  * @endcode
  *
  * @see cudaInitDev
  */
 EXPORTED_FUNCTION int memoryInfo(int* freeMB, int* totalMB);
-
 
 /**
  * @brief Initialize the CUDA device and create a GPU computation context.
@@ -643,4 +646,4 @@ EXPORTED_FUNCTION int cudaInitDev();
 }
 #endif
 
-#endif
+#endif // ODT_GPU_H

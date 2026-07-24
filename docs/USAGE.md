@@ -1,4 +1,4 @@
-# Usage Guide  
+﻿# Usage Guide  
 ODT GPU Library — Compact Workflow Overview
 
 This document provides a concise description of the two supported processing workflows. It is intended as a quick, practical reference for users integrating the library into their own software.
@@ -93,4 +93,41 @@ Each exported function is documented directly in the header file (ODT_GPU.h).
 
 ---
 
-© 2025 ODT GPU Library — For non-commercial research use only.
+## 5. API Reference and Additional Functions
+
+Two versions of the library header are provided:
+
+| File | Contents | Intended use |
+|------|----------|--------------|
+| `include/ODT_GPU.h` | Core workflow functions (HL00–HL04), optional diagnostic functions, and utility functions | Working with the precompiled DLL |
+| `src/ODT_GPU/ODT_GPU.h` | The above **plus** the legacy low-level API | Building from source; integrating with older code |
+
+Both headers document every function using Doxygen-style comments, including parameter descriptions and return codes.
+
+The functions are grouped into the following categories:
+
+- **Core workflow** — the main reconstruction pipeline (`HL00to02_*`, `HL01_*`, `HL02_sendDataAndGenerateKO`, `HL03_*`, `HL04_*`), plus reference-hologram management (`HL_addReference`, `HL_removeReference`) and their backward-compatible `HL00_*` aliases.
+- **Optional / diagnostic** — retrieval of intermediate results such as the generated K-space (`HL02_B_optionTakeKO`), the Ewald sphere occupancy map (`HL02_B_optionTakeEW`), and reference sinograms (`HL00_B_optionTakeSinoAmpRef`, `HL00_B_optionTakeSinoPhRef`). Useful for validation and comparison against reference implementations.
+- **Utility** — GPU device initialization (`cudaInitDev`) and memory reporting (`memoryInfo`).
+- **Legacy / low-level** *(source header only)* — an earlier step-by-step interface that predates the HL00–HL04 functions. Retained for backward compatibility with existing integrations; new projects should use the core workflow instead.
+
+---
+
+## 6. Optional Debug and Profiling Output
+
+The source code includes optional instrumentation that writes intermediate arrays to disk and reports execution times for individual processing steps. This is useful for validating a rebuilt library against a reference implementation, or for profiling performance on new hardware.
+
+The instrumentation is **disabled by default** and excluded from the compiled library. To enable it, uncomment the corresponding directives at the top of `src/ODT_GPU/ODT_GPU.h` and rebuild:
+
+```c
+//#define Save_data        // dump intermediate arrays
+//#define Save_data2       // dump additional intermediate arrays
+//#define Save_timings     // report per-step execution times
+//#define Save_timings_GP  // report Gerchberg-Papoulis loop timings
+```
+
+The output files are written to the current working directory of the host application.
+
+---
+
+© 2025–2026 ODT GPU Library — Licensed under the GNU General Public License v3.0.
